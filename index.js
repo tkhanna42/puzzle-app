@@ -1,3 +1,5 @@
+var initImage;
+
 (function(){
   function offset(x, y, w, h){
     return (y*w + x) * 4;
@@ -128,40 +130,47 @@
       }
     }
   }
+  
+  var canvas,w,h,unicornImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces;
 
-  var canvas = document.getElementById('canvas');
-  var w = canvas.width;
-  var h = canvas.height;
-  var unicornImage = document.getElementById('unicorn');
-  var imageWidth = 260;
-  var imageHeight = 280;
-  var gridSize = 4;
-  var g = canvas.getContext('2d');
-  g.drawImage(unicornImage,0,0,imageWidth,imageHeight);
-  var imageData = g.getImageData(0,0,imageWidth,imageHeight);
-  var imageGhost = g.createImageData(imageData);
-  setTransparency(imageData.data, imageGhost.data, 127);
+  initImage = function(){
+    canvas = document.getElementById('canvas');
+    w = canvas.width;
+    h = canvas.height;
+    unicornImage = document.getElementById('unicorn');
+    imageWidth = 260;
+    imageHeight = 280;
+    gridSize = 4;
+    g = canvas.getContext('2d');
+    g.drawImage(unicornImage,0,0,imageWidth,imageHeight);
+    imageData = g.getImageData(0,0,imageWidth,imageHeight);
+    imageGhost = g.createImageData(imageData);
+    setTransparency(imageData.data, imageGhost.data, 127);
 
-  var pieces = new Array(gridSize);
-  for(var i=0;i<gridSize;i++) pieces[i]=new Array(gridSize);
+    pieces = new Array(gridSize);
+    for(var i=0;i<gridSize;i++) pieces[i]=new Array(gridSize);
 
-  for(var x=0;x<gridSize;x++){
-    for(var y=0;y<gridSize;y++){
-      var p = {};
-      pieces[x][y] = p;
-      p.imageData = g.createImageData(imageWidth/gridSize, imageHeight/gridSize);
-      p.size = {x: p.imageData.width, y: p.imageData.height};
-      p.pos = randomizer();
-      copyPixels(imageData,p.imageData,x * p.size.x, y * p.size.y, p.size.x, p.size.y,
-        imageWidth);
-      outline(p.imageData,0,0,0,2);
-      p.ghost = g.createImageData(p.imageData);
-      setTransparency(p.imageData.data,p.ghost.data,50);
-      p.locked = false;
+    for(var x=0;x<gridSize;x++){
+      for(var y=0;y<gridSize;y++){
+        var p = {};
+        pieces[x][y] = p;
+        p.imageData = g.createImageData(imageWidth/gridSize, imageHeight/gridSize);
+        p.size = {x: p.imageData.width, y: p.imageData.height};
+        p.pos = randomizer();
+        copyPixels(imageData,p.imageData,x * p.size.x, y * p.size.y, p.size.x, p.size.y,
+          imageWidth);
+        outline(p.imageData,0,0,0,2);
+        p.ghost = g.createImageData(p.imageData);
+        setTransparency(p.imageData.data,p.ghost.data,50);
+        p.locked = false;
+      }
     }
-  }
 
-  draw();
+    draw();
+  }
+  
+  initImage();
+  
   var startX,startY,endX,endY,activePiece,mouseDown;
   canvas.addEventListener("mousedown",function(e){
     //console.log('mouse down');
