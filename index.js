@@ -1,5 +1,6 @@
 var initImage;
 var scramblePieces;
+var addListeners;
 
 (function(){
   function offset(x, y, w, h){
@@ -68,18 +69,15 @@ var scramblePieces;
     var maxWidth = canvas.width;
     var maxHeight = canvas.height;
 
-    var newX = Math.floor(Math.random() * maxWidth);
-    newX = (newX > canvas.width/2) ? Math.floor(newX * 1/5) : (Math.floor(newX * 1/5) + (canvas.width * 4/5));
+    var newX = Math.floor(Math.random() * (maxWidth - imageWidth / gridSize));
+    //newX = (newX > canvas.width/2) ? Math.floor(newX * 1/5) : (Math.floor(newX * 1/5) + (canvas.width * 4/5));
 
-    var newY = Math.floor(Math.random() * maxHeight);
-
-    //console.log(newX, newY);
-
-    // Testing with Green rectangle
-    g.beginPath();
-    g.fillStyle="green";
-    g.rect(newX,newY,50,50);
-    g.fill();
+    var newY;
+    if(newX >= (w - imageWidth)/2 - imageWidth / gridSize && newX <= (w + imageWidth)/2){
+      if(Math.random() > 0.5) newY = Math.floor(Math.random() * ((h - imageHeight)/2 - imageHeight / gridSize));
+      else newY = Math.floor((h + imageHeight)/2 + Math.random() * ((h - imageHeight)/2 - imageHeight / gridSize));
+    }
+    else newY = Math.floor(Math.random() * (maxHeight - imageHeight / gridSize));
 
     return {x:newX, y:newY};
   }
@@ -101,6 +99,14 @@ var scramblePieces;
     var dx = cx - piece.pos.x;
     var dy = cy - piece.pos.y;
     return dx*dx + dy*dy < diff2;
+  }
+
+  function isComplete(){
+    var complete = true;
+    for(var x=0;x<gridSize;x++)
+      for(var y=0;y<gridSize;y++)
+        if(!pieces[x][y].locked) return false;
+    return true;
   }
 
   function draw(invisible){
@@ -132,18 +138,21 @@ var scramblePieces;
     }
   }
 
-  var canvas,w,h,unicornImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces;
+  var canvas,w,h,puzzleImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces;
 
   initImage = function(){
+    console.log('initing image');
     canvas = document.getElementById('canvas');
     w = canvas.width;
     h = canvas.height;
-    unicornImage = document.getElementById('unicorn');
+    puzzleImage = document.getElementById('puzzleImage');
     imageWidth = 260;
     imageHeight = 280;
     gridSize = 4;
     g = canvas.getContext('2d');
-    g.drawImage(unicornImage,0,0,imageWidth,imageHeight);
+    g.fillStyle = '#ff0000';
+    g.fillRect(0,0,w,h);
+    g.drawImage(puzzleImage,0,0,imageWidth,imageHeight);
     imageData = g.getImageData(0,0,imageWidth,imageHeight);
     imageGhost = g.createImageData(imageData);
     setTransparency(imageData.data, imageGhost.data, 127);
@@ -168,6 +177,7 @@ var scramblePieces;
     }
 
     draw();
+
   }
   scramblePieces = function() {
     for (var i = 0; i < gridSize; i++) {
@@ -184,55 +194,58 @@ var scramblePieces;
     draw();
   }
 
-  initImage();
-
   var startX,startY,endX,endY,activePiece,mouseDown;
-  canvas.addEventListener("mousedown",function(e){
-    //console.log('mouse down');
-    mouseDown = true;
-    startX = e.pageX - canvas.offsetLeft;
-    startY = e.pageY - canvas.offsetTop;
-    for(var x=0;x<gridSize;x++){
-      for(var y=0;y<gridSize;y++){
-        var r = pieces[x][y].pos;
-        var s = pieces[x][y].size;
-        if(!pieces[x][y].locked && startX >= r.x && startX <= r.x + s.x && startY >= r.y && startY <= r.y + s.y){
-          activePiece = pieces[x][y];
-          return;
+  addListeners = function(){
+    canvas.addEventListener("mousedown",function(e){
+      //console.log('mouse down');
+      mouseDown = true;
+      startX = e.pageX - canvas.offsetLeft;
+      startY = e.pageY - canvas.offsetTop;
+      for(var x=0;x<gridSize;x++){
+        for(var y=0;y<gridSize;y++){
+          var r = pieces[x][y].pos;
+          var s = pieces[x][y].size;
+          if(!pieces[x][y].locked && startX >= r.x && startX <= r.x + s.x && startY >= r.y && startY <= r.y + s.y){
+            activePiece = pieces[x][y];
+            return;
+          }
         }
       }
-    }
-  });
+    });
 
-  canvas.addEventListener("mouseup",function(e){
-    mouseDown = false;
-    endX = e.pageX - canvas.offsetLeft;
-    endY = e.pageY - canvas.offsetTop;
-    if(activePiece){
-      activePiece.pos.x += endX - startX;
-      activePiece.pos.y += endY - startY;
-      if(inPlace(activePiece)){
-        idxs = getIdxs(activePiece);
-        activePiece.pos.x = (w - imageWidth)/2 + idxs.x*imageWidth/gridSize;
-        activePiece.pos.y = (h - imageHeight)/2 + idxs.y * imageHeight / gridSize;
-        activePiece.locked = true;
-      }
-      draw();
-      activePiece = null;
-    }
-  });
-
-  canvas.addEventListener("mousemove",function(e){
-    if(mouseDown && activePiece){
+    canvas.addEventListener("mouseup",function(e){
+      mouseDown = false;
       endX = e.pageX - canvas.offsetLeft;
       endY = e.pageY - canvas.offsetTop;
-      draw(activePiece);
-      g.putImageData(activePiece.ghost, activePiece.pos.x + endX - startX, activePiece.pos.y + endY - startY);
-    }
-  });
+      if(activePiece){
+        activePiece.pos.x += endX - startX;
+        activePiece.pos.y += endY - startY;
+        if(inPlace(activePiece)){
+          idxs = getIdxs(activePiece);
+          activePiece.pos.x = (w - imageWidth)/2 + idxs.x*imageWidth/gridSize;
+          activePiece.pos.y = (h - imageHeight)/2 + idxs.y * imageHeight / gridSize;
+          activePiece.locked = true;
+          if(isComplete()){
+            document.getElementById('success').style.display = 'block';
+          }
+        }
+        draw();
+        activePiece = null;
+      }
+    });
 
-  canvas.addEventListener("mouseleave",function(e){
-    mouseDown = false;
-    draw();
-  });
+    canvas.addEventListener("mousemove",function(e){
+      if(mouseDown && activePiece){
+        endX = e.pageX - canvas.offsetLeft;
+        endY = e.pageY - canvas.offsetTop;
+        draw(activePiece);
+        g.putImageData(activePiece.ghost, activePiece.pos.x + endX - startX, activePiece.pos.y + endY - startY);
+      }
+    });
+
+    canvas.addEventListener("mouseleave",function(e){
+      mouseDown = false;
+      draw();
+    });
+  }
 })();
