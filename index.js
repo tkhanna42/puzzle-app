@@ -70,6 +70,8 @@
   var g = canvas.getContext('2d');
   g.drawImage(unicornImage,0,0,imageWidth,imageHeight);
   var imageData = g.getImageData(0,0,imageWidth,imageHeight);
+  var imageGhost = g.createImageData(imageData);
+  setTransparency(imageData.data, imageGhost.data, 127);
 
   var pieces = new Array(gridSize);
   for(var i=0;i<gridSize;i++) pieces[i]=new Array(gridSize);
@@ -85,7 +87,7 @@
         imageWidth);
       outline(p.imageData,0,0,0,2);
       p.ghost = g.createImageData(p.imageData);
-      setTransparency(p.imageData.data,p.ghost.data,127);
+      setTransparency(p.imageData.data,p.ghost.data,50);
     }
   }
   
@@ -94,8 +96,26 @@
   
   var draw = function(invisible){
     g.fillStyle = '#fff';
-    g.fillRect(0,0,canvas.width,canvas.height);
+    g.strokeStyle = '#000';
+    g.lineWidth = 2;
+    var w = canvas.width;
+    var h = canvas.height;
+    g.fillRect(0,0,w,h);
+    g.putImageData(imageGhost, (w - imageWidth)/2, (h - imageHeight)/2);
+    //vertical lines of grid
+    for(var x=0; x <= gridSize; x++){
+      g.moveTo((w - imageWidth)/2 + x*imageWidth/gridSize, (h - imageHeight)/2);
+      g.lineTo((w - imageWidth)/2 + x*imageWidth/gridSize, (h + imageHeight)/2);
+      g.stroke();
+    }
+    //horizontal lines of grid
+    for(var y=0; y <= gridSize; y++){
+      g.moveTo((w - imageWidth)/2, (h - imageHeight)/2 + y * imageHeight / gridSize);
+      g.lineTo((w + imageWidth)/2, (h - imageHeight)/2 + y * imageHeight / gridSize);
+      g.stroke();
+    }
     
+    //drawPieces
     for(var x = gridSize - 1;x>=0;x--){
       for(var y = gridSize - 1;y>=0;y--){
         if(invisible !== pieces[x][y])g.putImageData(pieces[x][y].imageData, pieces[x][y].pos.x, pieces[x][y].pos.y);
