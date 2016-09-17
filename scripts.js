@@ -1,6 +1,7 @@
 
 function updateImage() {
     var img = document.getElementById("unicorn");
-    img.src = "./pink-unicorn.png";
-    console.log("hello");
+    var url = document.getElementsByName('url')[0].value;
+    img.src = url;
+    initImage();
 }
