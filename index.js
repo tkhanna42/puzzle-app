@@ -9,11 +9,11 @@
     imageData.data[dataOffset + 2] = b;
     imageData.data[dataOffset + 3] = a;
   }
-  
+
   var copy = function(src,dest){
     for(var i=0;i<src.data.length;i++)dest.data[i] = src.data[i];
   }
-  
+
   //w1 is the width of the src
   //w and h are the width of the dest
   var copyPixels = function(src,dest,x,y,w,h,w1){
@@ -21,14 +21,14 @@
       for(var py = 0; py<h ; py ++){
         var destOffset = offset(px, py, w);
         var srcOffset = offset(x + px, y + py, w1);
-        dest.data[destOffset] = src.data[srcOffset]; 
-        dest.data[destOffset + 1] = src.data[srcOffset + 1]; 
-        dest.data[destOffset + 2] = src.data[srcOffset + 2]; 
-        dest.data[destOffset + 3] = src.data[srcOffset + 3]; 
+        dest.data[destOffset] = src.data[srcOffset];
+        dest.data[destOffset + 1] = src.data[srcOffset + 1];
+        dest.data[destOffset + 2] = src.data[srcOffset + 2];
+        dest.data[destOffset + 3] = src.data[srcOffset + 3];
       }
     }
   }
-  
+
   //add an outline
   var outline = function(imageData, r, g, b, lw){
     var w = imageData.width;
@@ -49,9 +49,8 @@
     for(var x=w-lw; x<w; x++)
       for(var y=0; y<h; y++)
         write(imageData,x, y, r, g, b, 255);
-      
+
   }
-  
   //copies with new alpha
   var setTransparency = function(src,dest,a){
     for(var i=0; i<=src.length; i+=4){
@@ -61,7 +60,7 @@
       dest[i+3] = a;
     }
   }
-  
+
   var canvas = document.getElementById('canvas');
   var unicornImage = document.getElementById('unicorn');
   var imageWidth = 260;
@@ -75,7 +74,7 @@
 
   var pieces = new Array(gridSize);
   for(var i=0;i<gridSize;i++) pieces[i]=new Array(gridSize);
-  
+
   for(var x=0;x<gridSize;x++){
     for(var y=0;y<gridSize;y++){
       var p = {};
@@ -90,10 +89,10 @@
       setTransparency(p.imageData.data,p.ghost.data,50);
     }
   }
-  
+
   //move piece 1,1 out of grid formation
   pieces[1][1].pos = {x: 300,y: 300};
-  
+
   var draw = function(invisible){
     g.fillStyle = '#fff';
     g.strokeStyle = '#000';
@@ -122,9 +121,8 @@
       }
     }
   }
-  
+
   draw();
-  
   var startX,startY,endX,endY,activeElement,mouseDown;
   canvas.addEventListener("mousedown",function(e){
     //console.log('mouse down');
@@ -142,9 +140,8 @@
       }
     }
   });
-  
+
   canvas.addEventListener("mouseup",function(e){
-    //console.log('mouse up');   
     mouseDown = false;
     endX = e.pageX - canvas.offsetLeft;
     endY = e.pageY - canvas.offsetTop;
@@ -155,7 +152,29 @@
       activeElement = null;
     }
   });
-  
+
+  function randomizer(x, y) {
+    var maxWidth = canvas.width;
+    var maxHeight = canvas.height;
+
+    var newX = Math.floor(Math.random() * maxWidth);
+    newX = (newX > canvas.width/2) ? Math.floor(newX * 1/5) : (Math.floor(newX * 1/5) + (canvas.width * 4/5));
+
+    var newY = Math.floor(Math.random() * maxHeight);
+
+    console.log(newX, newY);
+
+    // Testing with Green rectangle
+    g.beginPath();
+    g.fillStyle="green";
+    g.rect(newX,newY,50,50);
+    g.fill();
+
+    return newX, newY
+  }
+  // Example call
+  randomizer();
+
   canvas.addEventListener("mousemove",function(e){
     if(mouseDown && activeElement){
       endX = e.pageX - canvas.offsetLeft;
