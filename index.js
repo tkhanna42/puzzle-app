@@ -210,7 +210,7 @@ var initImage;
         activePiece.pos.y = (h - imageHeight)/2 + idxs.y * imageHeight / gridSize;
         activePiece.locked = true;
         if(isComplete()){
-          document.getElementById('success').style.display = 'initial';
+          document.getElementById('success').style.display = 'block';
           console.log('complete');
         }
       }
