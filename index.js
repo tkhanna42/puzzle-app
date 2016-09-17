@@ -46,14 +46,42 @@
   //move piece 1,1 out of grid formation
   pieces[1][1].pos = {x: 300,y: 300};
   
-  g.fillStyle = '#fff';
-  g.fillRect(0,0,canvas.width,canvas.height);
-  
-  for(var x=0;x<gridSize;x++){
-    for(var y=0;y<gridSize;y++){
-      g.putImageData(pieces[x][y].imageData, pieces[x][y].pos.x, pieces[x][y].pos.y);
+  var draw = function(){
+    g.fillStyle = '#fff';
+    g.fillRect(0,0,canvas.width,canvas.height);
+    
+    for(var x=0;x<gridSize;x++){
+      for(var y=0;y<gridSize;y++){
+        g.putImageData(pieces[x][y].imageData, pieces[x][y].pos.x, pieces[x][y].pos.y);
+      }
     }
   }
-   
-  //console.log(imageData.data);
+  
+  draw();
+  
+  var startX,startY,endX,endY,activeElement;
+  canvas.addEventListener("mousedown",function(e){
+    console.log('mouse down');
+    startX = e.pageX - canvas.offsetLeft;
+    startY = e.pageY - canvas.offsetTop;
+    for(var x=0;x<gridSize;x++){
+      for(var y=0;y<gridSize;y++){
+        var r = pieces[x][y].pos;
+        var s = pieces[x][y].size;
+        if(startX >= r.x && startX <= r.x + s.x && startY >= r.y && startY <= r.y + s.y) activeElement = pieces[x][y];
+      }
+    }
+  });
+  
+  canvas.addEventListener("mouseup",function(e){
+    console.log('mouse up');    
+    endX = e.pageX - canvas.offsetLeft;
+    endY = e.pageY - canvas.offsetTop;
+    if(activeElement){
+      activeElement.pos.x += endX - startX;
+      activeElement.pos.y += endY - startY;
+      draw();
+      activeElement = null;
+    }
+  });
 })();
