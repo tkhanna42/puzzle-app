@@ -1,5 +1,8 @@
 body {
     text-align: center;
+    font-family: 'Arial';
+    font-size: 20px;
+
 }
 
 canvas {
@@ -8,4 +11,15 @@ canvas {
 
 img {
     display: none;
+}
+
+p {
+    display: none;
+    color: green;
+    font-size: 1.5rem;
+}
+
+span {
+    border: 5px solid green;
+    padding: 10px;
 }

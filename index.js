@@ -99,6 +99,14 @@ var initImage;
     return dx*dx + dy*dy < diff2;
   }
   
+  function isComplete(){
+    var complete = true;
+    for(var x=0;x<gridSize;x++)
+      for(var y=0;y<gridSize;y++)
+        if(!pieces[x][y].locked) return false;
+    return true;
+  }
+  
   function draw(invisible){
     g.fillStyle = '#fff';
     g.strokeStyle = '#000';
@@ -201,6 +209,10 @@ var initImage;
         activePiece.pos.x = (w - imageWidth)/2 + idxs.x*imageWidth/gridSize;
         activePiece.pos.y = (h - imageHeight)/2 + idxs.y * imageHeight / gridSize;
         activePiece.locked = true;
+        if(isComplete()){
+          document.getElementById('success').style.display = 'initial';
+          console.log('complete');
+        }
       }
       draw();
       activePiece = null;
