@@ -5,3 +5,4 @@ function updateImage() {
     img.src = url;
     initImage();
 }
+

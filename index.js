@@ -1,4 +1,5 @@
 var initImage;
+var scramblePieces;
 
 (function(){
   function offset(x, y, w, h){
@@ -62,7 +63,7 @@ var initImage;
       dest[i+3] = a;
     }
   }
-  
+
   function randomizer(x, y) {
     var maxWidth = canvas.width;
     var maxHeight = canvas.height;
@@ -82,26 +83,26 @@ var initImage;
 
     return {x:newX, y:newY};
   }
-  
+
   function getIdxs(piece){
     for(var x=0;x<gridSize;x++)
       for(var y=0;y<gridSize;y++)
         if(piece === pieces[x][y])
           return {x:x, y:y};
   }
-  
+
   //returns whether or not the piece is in the right place
   function inPlace(piece){
     //maximum allowable suared distance
     var diff2 = 100;
-    var idxs = getIdxs(piece); 
+    var idxs = getIdxs(piece);
     var cx = (w - imageWidth)/2 + idxs.x*imageWidth/gridSize;
     var cy = (h - imageHeight)/2 + idxs.y * imageHeight / gridSize;
     var dx = cx - piece.pos.x;
     var dy = cy - piece.pos.y;
     return dx*dx + dy*dy < diff2;
   }
-  
+
   function draw(invisible){
     g.fillStyle = '#fff';
     g.strokeStyle = '#000';
@@ -122,7 +123,7 @@ var initImage;
       g.lineTo((w + imageWidth)/2, (h - imageHeight)/2 + y * imageHeight / gridSize);
       g.stroke();
     }
-    
+
     //drawPieces
     for(var x = gridSize - 1;x>=0;x--){
       for(var y = gridSize - 1;y>=0;y--){
@@ -130,7 +131,7 @@ var initImage;
       }
     }
   }
-  
+
   var canvas,w,h,unicornImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces;
 
   initImage = function(){
@@ -168,9 +169,23 @@ var initImage;
 
     draw();
   }
-  
+  scramblePieces = function() {
+    for (var i = 0; i < gridSize; i++) {
+      for (var j = 0; j < gridSize; j++) {
+        var piece = pieces[i][j];
+        piece.locked = false;
+        piece.pos = randomizer();
+        console.log(piece);
+
+      }
+      console.log(i);
+
+    }
+    draw();
+  }
+
   initImage();
-  
+
   var startX,startY,endX,endY,activePiece,mouseDown;
   canvas.addEventListener("mousedown",function(e){
     //console.log('mouse down');
@@ -215,7 +230,7 @@ var initImage;
       g.putImageData(activePiece.ghost, activePiece.pos.x + endX - startX, activePiece.pos.y + endY - startY);
     }
   });
-  
+
   canvas.addEventListener("mouseleave",function(e){
     mouseDown = false;
     draw();
