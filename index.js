@@ -16,14 +16,14 @@
       for(var py = 0; py<h ; py ++){
         var destOffset = offset(px, py, w);
         var srcOffset = offset(x + px, y + py, w1);
-        dest.data[destOffset] = src.data[srcOffset]; 
-        dest.data[destOffset + 1] = src.data[srcOffset + 1]; 
-        dest.data[destOffset + 2] = src.data[srcOffset + 2]; 
-        dest.data[destOffset + 3] = src.data[srcOffset + 3]; 
+        dest.data[destOffset] = src.data[srcOffset];
+        dest.data[destOffset + 1] = src.data[srcOffset + 1];
+        dest.data[destOffset + 2] = src.data[srcOffset + 2];
+        dest.data[destOffset + 3] = src.data[srcOffset + 3];
       }
     }
   }
-  
+
   //add an outline
   var outline = function(imageData, r, g, b, lw){
     var w = imageData.width;
@@ -44,9 +44,9 @@
     for(var x=w-lw; x<w; x++)
       for(var y=0; y<h; y++)
         write(imageData,x, y, r, g, b, 255);
-      
+
   }
-  
+
   var canvas = document.getElementById('canvas');
   var unicornImage = document.getElementById('unicorn');
   var imageWidth = 260;
@@ -66,7 +66,7 @@
       outline(grid[x][y],0,0,0,2);
     }
   }
-  
+
   var pieces = new Array(gridSize);
   for(var i=0;i<gridSize;i++) pieces[i]=new Array(gridSize);
   for(var x=0;x<gridSize;x++){
@@ -78,23 +78,23 @@
       p.pos = {x: (p.size.x+10)*x, y: (p.size.x+10)*y};
     }
   }
-  
+
   //move piece 1,1 out of grid formation
   pieces[1][1].pos = {x: 300,y: 300};
-  
+
   var draw = function(){
     g.fillStyle = '#fff';
     g.fillRect(0,0,canvas.width,canvas.height);
-    
+
     for(var x = gridSize - 1;x>=0;x--){
       for(var y = gridSize - 1;y>=0;y--){
         g.putImageData(pieces[x][y].imageData, pieces[x][y].pos.x, pieces[x][y].pos.y);
       }
     }
   }
-  
+
   draw();
-  
+
   var startX,startY,endX,endY,activeElement;
   canvas.addEventListener("mousedown",function(e){
     console.log('mouse down');
@@ -111,9 +111,9 @@
       }
     }
   });
-  
+
   canvas.addEventListener("mouseup",function(e){
-    console.log('mouse up');    
+    console.log('mouse up');
     endX = e.pageX - canvas.offsetLeft;
     endY = e.pageY - canvas.offsetTop;
     if(activeElement){
@@ -123,4 +123,26 @@
       activeElement = null;
     }
   });
+
+  function randomizer(x, y) {
+    var maxWidth = canvas.width;
+    var maxHeight = canvas.height;
+
+    var newX = Math.floor(Math.random() * maxWidth);
+    newX = (newX > canvas.width/2) ? Math.floor(newX * 1/5) : (Math.floor(newX * 1/5) + (canvas.width * 4/5));
+
+    var newY = Math.floor(Math.random() * maxHeight);
+
+    console.log(newX, newY);
+
+    // Testing with Green rectangle
+    g.beginPath();
+    g.fillStyle="green";
+    g.rect(newX,newY,50,50);
+    g.fill();
+
+    return newX, newY
+  }
+  // Example call
+  randomizer();
 })();
