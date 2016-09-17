@@ -10,7 +10,9 @@ canvas {
 }
 
 img {
-    display: none;
+    vertical-align: top;
+    width: 300px;
+    height: 300px;
 }
 
 p {

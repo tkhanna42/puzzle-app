@@ -1,5 +1,5 @@
 var initImage, addListeners;
-
+var checkClicked;
 (function(){
   function offset(x, y, w, h){
     return (y*w + x) * 4;
@@ -112,7 +112,7 @@ var initImage, addListeners;
     g.strokeStyle = '#000';
     g.lineWidth = 2;
     g.fillRect(0,0,w,h);
-    g.putImageData(imageGhost, (w - imageWidth)/2, (h - imageHeight)/2);
+    if(showHint)g.putImageData(imageGhost, (w - imageWidth)/2, (h - imageHeight)/2);
     //vertical lines of grid
     for(var x=0; x <= gridSize; x++){
       g.beginPath();
@@ -136,7 +136,7 @@ var initImage, addListeners;
     }
   }
   
-  var canvas,w,h,puzzleImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces;
+  var canvas,w,h,puzzleImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces,showHint;
 
   initImage = function(){
     console.log('initing image');
@@ -144,8 +144,8 @@ var initImage, addListeners;
     w = canvas.width;
     h = canvas.height;
     puzzleImage = document.getElementById('puzzleImage');
-    imageWidth = 260;
-    imageHeight = 280;
+    imageWidth = 300;
+    imageHeight = 300;
     gridSize = 4;
     g = canvas.getContext('2d');
     g.fillStyle = '#ff0000';
@@ -231,5 +231,10 @@ var initImage, addListeners;
       mouseDown = false;
       draw();
     });
+  }
+  
+  checkClicked = function(){
+    showHint = document.getElementById('hint').checked;
+    draw();
   }
 })();
