@@ -1,4 +1,4 @@
-var initImage;
+var initImage, addListeners;
 
 (function(){
   function offset(x, y, w, h){
@@ -136,20 +136,21 @@ var initImage;
     }
   }
   
-  var canvas,w,h,unicornImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces;
+  var canvas,w,h,puzzleImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces;
 
   initImage = function(){
+    console.log('initing image');
     canvas = document.getElementById('canvas');
     w = canvas.width;
     h = canvas.height;
-    unicornImage = document.getElementById('unicorn');
+    puzzleImage = document.getElementById('puzzleImage');
     imageWidth = 260;
     imageHeight = 280;
     gridSize = 4;
     g = canvas.getContext('2d');
     g.fillStyle = '#ff0000';
     g.fillRect(0,0,w,h);
-    g.drawImage(unicornImage,0,0,imageWidth,imageHeight);
+    g.drawImage(puzzleImage,0,0,imageWidth,imageHeight);
     imageData = g.getImageData(0,0,imageWidth,imageHeight);
     imageGhost = g.createImageData(imageData);
     setTransparency(imageData.data, imageGhost.data, 127);
@@ -177,59 +178,58 @@ var initImage;
 
   }
   
-  initImage();
-  
   var startX,startY,endX,endY,activePiece,mouseDown;
-  canvas.addEventListener("mousedown",function(e){
-    //console.log('mouse down');
-    mouseDown = true;
-    startX = e.pageX - canvas.offsetLeft;
-    startY = e.pageY - canvas.offsetTop;
-    for(var x=0;x<gridSize;x++){
-      for(var y=0;y<gridSize;y++){
-        var r = pieces[x][y].pos;
-        var s = pieces[x][y].size;
-        if(!pieces[x][y].locked && startX >= r.x && startX <= r.x + s.x && startY >= r.y && startY <= r.y + s.y){
-          activePiece = pieces[x][y];
-          return;
+  addListeners = function(){
+    canvas.addEventListener("mousedown",function(e){
+      //console.log('mouse down');
+      mouseDown = true;
+      startX = e.pageX - canvas.offsetLeft;
+      startY = e.pageY - canvas.offsetTop;
+      for(var x=0;x<gridSize;x++){
+        for(var y=0;y<gridSize;y++){
+          var r = pieces[x][y].pos;
+          var s = pieces[x][y].size;
+          if(!pieces[x][y].locked && startX >= r.x && startX <= r.x + s.x && startY >= r.y && startY <= r.y + s.y){
+            activePiece = pieces[x][y];
+            return;
+          }
         }
       }
-    }
-  });
+    });
 
-  canvas.addEventListener("mouseup",function(e){
-    mouseDown = false;
-    endX = e.pageX - canvas.offsetLeft;
-    endY = e.pageY - canvas.offsetTop;
-    if(activePiece){
-      activePiece.pos.x += endX - startX;
-      activePiece.pos.y += endY - startY;
-      if(inPlace(activePiece)){
-        idxs = getIdxs(activePiece);
-        activePiece.pos.x = (w - imageWidth)/2 + idxs.x*imageWidth/gridSize;
-        activePiece.pos.y = (h - imageHeight)/2 + idxs.y * imageHeight / gridSize;
-        activePiece.locked = true;
-        if(isComplete()){
-          document.getElementById('success').style.display = 'block';
-          console.log('complete');
-        }
-      }
-      draw();
-      activePiece = null;
-    }
-  });
-
-  canvas.addEventListener("mousemove",function(e){
-    if(mouseDown && activePiece){
+    canvas.addEventListener("mouseup",function(e){
+      mouseDown = false;
       endX = e.pageX - canvas.offsetLeft;
       endY = e.pageY - canvas.offsetTop;
-      draw(activePiece);
-      g.putImageData(activePiece.ghost, activePiece.pos.x + endX - startX, activePiece.pos.y + endY - startY);
-    }
-  });
-  
-  canvas.addEventListener("mouseleave",function(e){
-    mouseDown = false;
-    draw();
-  });
+      if(activePiece){
+        activePiece.pos.x += endX - startX;
+        activePiece.pos.y += endY - startY;
+        if(inPlace(activePiece)){
+          idxs = getIdxs(activePiece);
+          activePiece.pos.x = (w - imageWidth)/2 + idxs.x*imageWidth/gridSize;
+          activePiece.pos.y = (h - imageHeight)/2 + idxs.y * imageHeight / gridSize;
+          activePiece.locked = true;
+          if(isComplete()){
+            document.getElementById('success').style.display = 'block';
+          }
+        }
+        draw();
+        activePiece = null;
+      }
+    });
+
+    canvas.addEventListener("mousemove",function(e){
+      if(mouseDown && activePiece){
+        endX = e.pageX - canvas.offsetLeft;
+        endY = e.pageY - canvas.offsetTop;
+        draw(activePiece);
+        g.putImageData(activePiece.ghost, activePiece.pos.x + endX - startX, activePiece.pos.y + endY - startY);
+      }
+    });
+    
+    canvas.addEventListener("mouseleave",function(e){
+      mouseDown = false;
+      draw();
+    });
+  }
 })();
