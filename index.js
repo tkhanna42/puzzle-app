@@ -31,14 +31,29 @@
     }
   }
   
+  var pieces = new Array(gridSize);
+  for(var i=0;i<gridSize;i++) pieces[i]=new Array(gridSize);
+  for(var x=0;x<gridSize;x++){
+    for(var y=0;y<gridSize;y++){
+      var p = {};
+      pieces[x][y] = p;
+      p.imageData = grid[x][y];
+      p.size = {x: grid[x][y].width, y: grid[x][y].height};
+      p.pos = {x: (p.size.x+10)*x, y: (p.size.x+10)*y};
+    }
+  }
+  
+  //move piece 1,1 out of grid formation
+  pieces[1][1].pos = {x: 300,y: 300};
+  
   g.fillStyle = '#fff';
   g.fillRect(0,0,canvas.width,canvas.height);
   
-   for(var x=0;x<gridSize;x++){
+  for(var x=0;x<gridSize;x++){
     for(var y=0;y<gridSize;y++){
-      g.putImageData(grid[x][y], (grid[x][y].width + 10) * x, (grid[x][y].height + 10) * y);
+      g.putImageData(pieces[x][y].imageData, pieces[x][y].pos.x, pieces[x][y].pos.y);
     }
-   }
+  }
    
-  console.log(imageData.data);
+  //console.log(imageData.data);
 })();
