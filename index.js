@@ -9,6 +9,11 @@
     imageData.data[dataOffset + 2] = b;
     imageData.data[dataOffset + 3] = a;
   }
+  
+  var copy = function(src,dest){
+    for(var i=0;i<src.data.length;i++)dest.data[i] = src.data[i];
+  }
+  
   //w1 is the width of the src
   //w and h are the width of the dest
   var copyPixels = function(src,dest,x,y,w,h,w1){
@@ -47,6 +52,16 @@
       
   }
   
+  //copies with new alpha
+  var setTransparency = function(src,dest,a){
+    for(var i=0; i<=src.length; i+=4){
+      dest[i] = src[i];
+      dest[i+1] = src[i+1];
+      dest[i+2] = src[i+2];
+      dest[i+3] = a;
+    }
+  }
+  
   var canvas = document.getElementById('canvas');
   var unicornImage = document.getElementById('unicorn');
   var imageWidth = 260;
@@ -55,49 +70,45 @@
   var g = canvas.getContext('2d');
   g.drawImage(unicornImage,0,0,imageWidth,imageHeight);
   var imageData = g.getImageData(0,0,imageWidth,imageHeight);
-  var grid = new Array(gridSize);
-  for(var i=0;i<gridSize;i++) grid[i]=new Array(gridSize);
 
-  for(var x=0;x<gridSize;x++){
-    for(var y=0;y<gridSize;y++){
-      grid[x][y] = g.getImageData(0, 0, imageWidth/gridSize, imageHeight/gridSize);
-      copyPixels(imageData,grid[x][y],x * grid[x][y].width, y * grid[x][y].height, grid[x][y].width, grid[x][y].height,
-        imageWidth);
-      outline(grid[x][y],0,0,0,2);
-    }
-  }
-  
   var pieces = new Array(gridSize);
   for(var i=0;i<gridSize;i++) pieces[i]=new Array(gridSize);
+  
   for(var x=0;x<gridSize;x++){
     for(var y=0;y<gridSize;y++){
       var p = {};
       pieces[x][y] = p;
-      p.imageData = grid[x][y];
-      p.size = {x: grid[x][y].width, y: grid[x][y].height};
+      p.imageData = g.createImageData(imageWidth/gridSize, imageHeight/gridSize);
+      p.size = {x: p.imageData.width, y: p.imageData.height};
       p.pos = {x: (p.size.x+10)*x, y: (p.size.x+10)*y};
+      copyPixels(imageData,p.imageData,x * p.size.x, y * p.size.y, p.size.x, p.size.y,
+        imageWidth);
+      outline(p.imageData,0,0,0,2);
+      p.ghost = g.createImageData(p.imageData);
+      setTransparency(p.imageData.data,p.ghost.data,127);
     }
   }
   
   //move piece 1,1 out of grid formation
   pieces[1][1].pos = {x: 300,y: 300};
   
-  var draw = function(){
+  var draw = function(invisible){
     g.fillStyle = '#fff';
     g.fillRect(0,0,canvas.width,canvas.height);
     
     for(var x = gridSize - 1;x>=0;x--){
       for(var y = gridSize - 1;y>=0;y--){
-        g.putImageData(pieces[x][y].imageData, pieces[x][y].pos.x, pieces[x][y].pos.y);
+        if(invisible !== pieces[x][y])g.putImageData(pieces[x][y].imageData, pieces[x][y].pos.x, pieces[x][y].pos.y);
       }
     }
   }
   
   draw();
   
-  var startX,startY,endX,endY,activeElement;
+  var startX,startY,endX,endY,activeElement,mouseDown;
   canvas.addEventListener("mousedown",function(e){
-    console.log('mouse down');
+    //console.log('mouse down');
+    mouseDown = true;
     startX = e.pageX - canvas.offsetLeft;
     startY = e.pageY - canvas.offsetTop;
     for(var x=0;x<gridSize;x++){
@@ -113,7 +124,8 @@
   });
   
   canvas.addEventListener("mouseup",function(e){
-    console.log('mouse up');    
+    //console.log('mouse up');   
+    mouseDown = false;
     endX = e.pageX - canvas.offsetLeft;
     endY = e.pageY - canvas.offsetTop;
     if(activeElement){
@@ -121,6 +133,15 @@
       activeElement.pos.y += endY - startY;
       draw();
       activeElement = null;
+    }
+  });
+  
+  canvas.addEventListener("mousemove",function(e){
+    if(mouseDown && activeElement){
+      endX = e.pageX - canvas.offsetLeft;
+      endY = e.pageY - canvas.offsetTop;
+      draw(activeElement);
+      g.putImageData(activeElement.ghost, activeElement.pos.x + endX - startX, activeElement.pos.y + endY - startY);
     }
   });
 })();
