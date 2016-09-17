@@ -60,6 +60,26 @@
       dest[i+3] = a;
     }
   }
+  
+  function randomizer(x, y) {
+    var maxWidth = canvas.width;
+    var maxHeight = canvas.height;
+
+    var newX = Math.floor(Math.random() * maxWidth);
+    newX = (newX > canvas.width/2) ? Math.floor(newX * 1/5) : (Math.floor(newX * 1/5) + (canvas.width * 4/5));
+
+    var newY = Math.floor(Math.random() * maxHeight);
+
+    console.log(newX, newY);
+
+    // Testing with Green rectangle
+    g.beginPath();
+    g.fillStyle="green";
+    g.rect(newX,newY,50,50);
+    g.fill();
+
+    return {x:newX, y:newY};
+  }
 
   var canvas = document.getElementById('canvas');
   var unicornImage = document.getElementById('unicorn');
@@ -81,7 +101,7 @@
       pieces[x][y] = p;
       p.imageData = g.createImageData(imageWidth/gridSize, imageHeight/gridSize);
       p.size = {x: p.imageData.width, y: p.imageData.height};
-      p.pos = {x: (p.size.x+10)*x, y: (p.size.x+10)*y};
+      p.pos = randomizer();
       copyPixels(imageData,p.imageData,x * p.size.x, y * p.size.y, p.size.x, p.size.y,
         imageWidth);
       outline(p.imageData,0,0,0,2);
@@ -89,9 +109,6 @@
       setTransparency(p.imageData.data,p.ghost.data,50);
     }
   }
-
-  //move piece 1,1 out of grid formation
-  pieces[1][1].pos = {x: 300,y: 300};
 
   var draw = function(invisible){
     g.fillStyle = '#fff';
@@ -103,12 +120,14 @@
     g.putImageData(imageGhost, (w - imageWidth)/2, (h - imageHeight)/2);
     //vertical lines of grid
     for(var x=0; x <= gridSize; x++){
+      g.beginPath();
       g.moveTo((w - imageWidth)/2 + x*imageWidth/gridSize, (h - imageHeight)/2);
       g.lineTo((w - imageWidth)/2 + x*imageWidth/gridSize, (h + imageHeight)/2);
       g.stroke();
     }
     //horizontal lines of grid
     for(var y=0; y <= gridSize; y++){
+      g.beginPath();
       g.moveTo((w - imageWidth)/2, (h - imageHeight)/2 + y * imageHeight / gridSize);
       g.lineTo((w + imageWidth)/2, (h - imageHeight)/2 + y * imageHeight / gridSize);
       g.stroke();
@@ -152,28 +171,6 @@
       activeElement = null;
     }
   });
-
-  function randomizer(x, y) {
-    var maxWidth = canvas.width;
-    var maxHeight = canvas.height;
-
-    var newX = Math.floor(Math.random() * maxWidth);
-    newX = (newX > canvas.width/2) ? Math.floor(newX * 1/5) : (Math.floor(newX * 1/5) + (canvas.width * 4/5));
-
-    var newY = Math.floor(Math.random() * maxHeight);
-
-    console.log(newX, newY);
-
-    // Testing with Green rectangle
-    g.beginPath();
-    g.fillStyle="green";
-    g.rect(newX,newY,50,50);
-    g.fill();
-
-    return newX, newY
-  }
-  // Example call
-  randomizer();
 
   canvas.addEventListener("mousemove",function(e){
     if(mouseDown && activeElement){
