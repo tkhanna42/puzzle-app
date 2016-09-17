@@ -2,10 +2,20 @@
 <html>
 <head>
   <title>Puzzle</title>
-</head>
-<body>
-  <canvas id="canvas" width="600" height="600" style="border: 1px solid black"></canvas>
-  <img id="unicorn" src="scribble.png" style="display: none">
+  <link rel="stylesheet" type="text/css" href="styles.css">
   <script src="index.js"></script>
+  <script src="scripts.js"></script>
+</head>
+<body onload="addListeners()">
+<h1>Drag and Drop Puzzle</h1>
+    <p id="success"><span>Success!</span></p>
+  <canvas id="canvas" width="600" height="600" style="border: 1px solid black"></canvas>
+  <div>
+    <label> Image URL:
+      <input type="text" name="url">
+      <button onclick="updateImage()">Submit</button>
+  </label>
+  </div>
+  <img id="puzzleImage" src="scribble.png" onload="initImage()">
 </body>
 </html>
