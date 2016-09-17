@@ -67,18 +67,15 @@ var initImage;
     var maxWidth = canvas.width;
     var maxHeight = canvas.height;
 
-    var newX = Math.floor(Math.random() * maxWidth);
-    newX = (newX > canvas.width/2) ? Math.floor(newX * 1/5) : (Math.floor(newX * 1/5) + (canvas.width * 4/5));
+    var newX = Math.floor(Math.random() * (maxWidth - imageWidth / gridSize));
+    //newX = (newX > canvas.width/2) ? Math.floor(newX * 1/5) : (Math.floor(newX * 1/5) + (canvas.width * 4/5));
 
-    var newY = Math.floor(Math.random() * maxHeight);
-
-    //console.log(newX, newY);
-
-    // Testing with Green rectangle
-    g.beginPath();
-    g.fillStyle="green";
-    g.rect(newX,newY,50,50);
-    g.fill();
+    var newY; 
+    if(newX >= (w - imageWidth)/2 - imageWidth / gridSize && newX <= (w + imageWidth)/2){ 
+      if(Math.random() > 0.5) newY = Math.floor(Math.random() * ((h - imageHeight)/2 - imageHeight / gridSize));
+      else newY = Math.floor((h + imageHeight)/2 + Math.random() * ((h - imageHeight)/2 - imageHeight / gridSize));
+    }
+    else newY = Math.floor(Math.random() * (maxHeight - imageHeight / gridSize));
 
     return {x:newX, y:newY};
   }
@@ -142,6 +139,8 @@ var initImage;
     imageHeight = 280;
     gridSize = 4;
     g = canvas.getContext('2d');
+    g.fillStyle = '#ff0000';
+    g.fillRect(0,0,w,h);
     g.drawImage(unicornImage,0,0,imageWidth,imageHeight);
     imageData = g.getImageData(0,0,imageWidth,imageHeight);
     imageGhost = g.createImageData(imageData);
@@ -167,6 +166,7 @@ var initImage;
     }
 
     draw();
+
   }
   
   initImage();
