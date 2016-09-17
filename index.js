@@ -70,16 +70,6 @@
   g.drawImage(unicornImage,0,0,imageWidth,imageHeight);
   var imageData = g.getImageData(0,0,imageWidth,imageHeight);
 
-
-  for(var x=0;x<gridSize;x++){
-    for(var y=0;y<gridSize;y++){
-      grid[x][y] = g.getImageData(0, 0, imageWidth/gridSize, imageHeight/gridSize);
-      copyPixels(imageData,grid[x][y],x * grid[x][y].width, y * grid[x][y].height, grid[x][y].width, grid[x][y].height,
-        imageWidth);
-      outline(grid[x][y],0,0,0,2);
-    }
-  }
-
   var pieces = new Array(gridSize);
   for(var i=0;i<gridSize;i++) pieces[i]=new Array(gridSize);
 
