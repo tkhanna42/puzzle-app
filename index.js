@@ -143,6 +143,7 @@ var addListeners;
 
   initImage = function(){
     console.log('initing image');
+    document.getElementById('success').style.display = 'none';
     canvas = document.getElementById('canvas');
     w = canvas.width;
     h = canvas.height;
@@ -151,8 +152,6 @@ var addListeners;
     imageHeight = 300;
     gridSize = 4;
     g = canvas.getContext('2d');
-    g.fillStyle = '#ff0000';
-    g.fillRect(0,0,w,h);
     g.drawImage(puzzleImage,0,0,imageWidth,imageHeight);
     imageData = g.getImageData(0,0,imageWidth,imageHeight);
     imageGhost = g.createImageData(imageData);
@@ -186,11 +185,9 @@ var addListeners;
         var piece = pieces[i][j];
         piece.locked = false;
         piece.pos = randomizer();
-        console.log(piece);
       }
-      console.log(i);
-
     }
+    document.getElementById('success').style.display = 'none';
     draw();
   }
 
