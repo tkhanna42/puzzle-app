@@ -10,12 +10,12 @@
 <h1>Drag and Drop Puzzle</h1>
     <p id="success"><span>Success!</span></p>
   <canvas id="canvas" width="600" height="600" style="border: 1px solid black"></canvas>
-  <div>
-    <label> Image URL:
-      <input type="text" name="url">
-      <button onclick="updateImage()">Submit</button>
-  </label>
-  </div>
   <img id="puzzleImage" src="scribble.png" onload="initImage()">
+  <div>
+      <input type="text" name="url" placeholder="Image URL:">
+      <button onclick="updateImage()">Submit</button>
+      <button onclick="scramblePieces()">Scramble</button>
+      <input type="checkbox" id="hint" onclick="checkClicked()">show hint<br>
+  </div>
 </body>
 </html>

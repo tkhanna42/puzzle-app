@@ -1,4 +1,7 @@
-var initImage, addListeners;
+var checkClicked;
+var initImage;
+var scramblePieces;
+var addListeners;
 
 (function(){
   function offset(x, y, w, h){
@@ -62,7 +65,7 @@ var initImage, addListeners;
       dest[i+3] = a;
     }
   }
-  
+
   function randomizer(x, y) {
     var maxWidth = canvas.width;
     var maxHeight = canvas.height;
@@ -70,8 +73,8 @@ var initImage, addListeners;
     var newX = Math.floor(Math.random() * (maxWidth - imageWidth / gridSize));
     //newX = (newX > canvas.width/2) ? Math.floor(newX * 1/5) : (Math.floor(newX * 1/5) + (canvas.width * 4/5));
 
-    var newY; 
-    if(newX >= (w - imageWidth)/2 - imageWidth / gridSize && newX <= (w + imageWidth)/2){ 
+    var newY;
+    if(newX >= (w - imageWidth)/2 - imageWidth / gridSize && newX <= (w + imageWidth)/2){
       if(Math.random() > 0.5) newY = Math.floor(Math.random() * ((h - imageHeight)/2 - imageHeight / gridSize));
       else newY = Math.floor((h + imageHeight)/2 + Math.random() * ((h - imageHeight)/2 - imageHeight / gridSize));
     }
@@ -79,26 +82,26 @@ var initImage, addListeners;
 
     return {x:newX, y:newY};
   }
-  
+
   function getIdxs(piece){
     for(var x=0;x<gridSize;x++)
       for(var y=0;y<gridSize;y++)
         if(piece === pieces[x][y])
           return {x:x, y:y};
   }
-  
+
   //returns whether or not the piece is in the right place
   function inPlace(piece){
     //maximum allowable suared distance
     var diff2 = 100;
-    var idxs = getIdxs(piece); 
+    var idxs = getIdxs(piece);
     var cx = (w - imageWidth)/2 + idxs.x*imageWidth/gridSize;
     var cy = (h - imageHeight)/2 + idxs.y * imageHeight / gridSize;
     var dx = cx - piece.pos.x;
     var dy = cy - piece.pos.y;
     return dx*dx + dy*dy < diff2;
   }
-  
+
   function isComplete(){
     var complete = true;
     for(var x=0;x<gridSize;x++)
@@ -106,13 +109,13 @@ var initImage, addListeners;
         if(!pieces[x][y].locked) return false;
     return true;
   }
-  
+
   function draw(invisible){
     g.fillStyle = '#fff';
     g.strokeStyle = '#000';
     g.lineWidth = 2;
     g.fillRect(0,0,w,h);
-    g.putImageData(imageGhost, (w - imageWidth)/2, (h - imageHeight)/2);
+    if(showHint)g.putImageData(imageGhost, (w - imageWidth)/2, (h - imageHeight)/2);
     //vertical lines of grid
     for(var x=0; x <= gridSize; x++){
       g.beginPath();
@@ -127,7 +130,7 @@ var initImage, addListeners;
       g.lineTo((w + imageWidth)/2, (h - imageHeight)/2 + y * imageHeight / gridSize);
       g.stroke();
     }
-    
+
     //drawPieces
     for(var x = gridSize - 1;x>=0;x--){
       for(var y = gridSize - 1;y>=0;y--){
@@ -136,7 +139,7 @@ var initImage, addListeners;
     }
   }
   
-  var canvas,w,h,puzzleImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces;
+  var canvas,w,h,puzzleImage,imageWidth,imageHeight,gridSize,g,imageData,imageGhost,pieces,showHint;
 
   initImage = function(){
     console.log('initing image');
@@ -144,8 +147,8 @@ var initImage, addListeners;
     w = canvas.width;
     h = canvas.height;
     puzzleImage = document.getElementById('puzzleImage');
-    imageWidth = 260;
-    imageHeight = 280;
+    imageWidth = 300;
+    imageHeight = 300;
     gridSize = 4;
     g = canvas.getContext('2d');
     g.fillStyle = '#ff0000';
@@ -177,7 +180,21 @@ var initImage, addListeners;
     draw();
 
   }
-  
+  scramblePieces = function() {
+    for (var i = 0; i < gridSize; i++) {
+      for (var j = 0; j < gridSize; j++) {
+        var piece = pieces[i][j];
+        piece.locked = false;
+        piece.pos = randomizer();
+        console.log(piece);
+
+      }
+      console.log(i);
+
+    }
+    draw();
+  }
+
   var startX,startY,endX,endY,activePiece,mouseDown;
   addListeners = function(){
     canvas.addEventListener("mousedown",function(e){
@@ -226,10 +243,15 @@ var initImage, addListeners;
         g.putImageData(activePiece.ghost, activePiece.pos.x + endX - startX, activePiece.pos.y + endY - startY);
       }
     });
-    
+
     canvas.addEventListener("mouseleave",function(e){
       mouseDown = false;
       draw();
     });
+  }
+  
+  checkClicked = function(){
+    showHint = document.getElementById('hint').checked;
+    draw();
   }
 })();
