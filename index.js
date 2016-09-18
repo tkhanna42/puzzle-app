@@ -187,7 +187,6 @@ var addListeners;
         piece.locked = false;
         piece.pos = randomizer();
         console.log(piece);
-
       }
       console.log(i);
 
