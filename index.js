@@ -217,6 +217,7 @@ var addListeners;
       if(activePiece){
         activePiece.pos.x += endX - startX;
         activePiece.pos.y += endY - startY;
+        //lock piece into place
         if(inPlace(activePiece)){
           idxs = getIdxs(activePiece);
           activePiece.pos.x = (w - imageWidth)/2 + idxs.x*imageWidth/gridSize;
@@ -226,6 +227,15 @@ var addListeners;
             document.getElementById('success').style.display = 'block';
           }
         }
+        //at invalid position on board -> reject and undo move
+        else if(activePiece.pos.x >= (w - imageWidth)/2 - activePiece.size.x &&
+                activePiece.pos.x <= (w + imageWidth)/2 &&
+                activePiece.pos.y >= (h - imageHeight)/2 - activePiece.size.y &&
+                activePiece.pos.y <= (h + imageHeight)/2){               
+            activePiece.pos.x -= endX - startX;
+            activePiece.pos.y -= endY - startY;
+        }
+        //else keep move how it is
         draw();
         activePiece = null;
       }
