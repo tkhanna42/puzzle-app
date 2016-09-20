@@ -143,6 +143,7 @@ var addListeners;
 
   initImage = function(){
     console.log('initing image');
+    document.getElementById('success').style.display = 'none';
     canvas = document.getElementById('canvas');
     w = canvas.width;
     h = canvas.height;
@@ -151,8 +152,6 @@ var addListeners;
     imageHeight = 300;
     gridSize = 4;
     g = canvas.getContext('2d');
-    g.fillStyle = '#ff0000';
-    g.fillRect(0,0,w,h);
     g.drawImage(puzzleImage,0,0,imageWidth,imageHeight);
     imageData = g.getImageData(0,0,imageWidth,imageHeight);
     imageGhost = g.createImageData(imageData);
@@ -186,12 +185,9 @@ var addListeners;
         var piece = pieces[i][j];
         piece.locked = false;
         piece.pos = randomizer();
-        console.log(piece);
-
       }
-      console.log(i);
-
     }
+    document.getElementById('success').style.display = 'none';
     draw();
   }
 
@@ -221,6 +217,7 @@ var addListeners;
       if(activePiece){
         activePiece.pos.x += endX - startX;
         activePiece.pos.y += endY - startY;
+        //lock piece into place
         if(inPlace(activePiece)){
           idxs = getIdxs(activePiece);
           activePiece.pos.x = (w - imageWidth)/2 + idxs.x*imageWidth/gridSize;
@@ -230,6 +227,15 @@ var addListeners;
             document.getElementById('success').style.display = 'block';
           }
         }
+        //at invalid position on board -> reject and undo move
+        else if(activePiece.pos.x >= (w - imageWidth)/2 - activePiece.size.x &&
+                activePiece.pos.x <= (w + imageWidth)/2 &&
+                activePiece.pos.y >= (h - imageHeight)/2 - activePiece.size.y &&
+                activePiece.pos.y <= (h + imageHeight)/2){               
+            activePiece.pos.x -= endX - startX;
+            activePiece.pos.y -= endY - startY;
+        }
+        //else keep move how it is
         draw();
         activePiece = null;
       }
